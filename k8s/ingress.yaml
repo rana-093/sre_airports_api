@@ -1,0 +1,26 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: nginx-virtual-server
+spec:
+  upstreams:
+    - name: airport-service
+      service: airport-service
+      port: 80
+  routes:
+    - path: /airports
+      splits:
+        - weight: 80
+          action:
+            proxy:
+              upstream: airport-service
+              rewritePath: /airports
+        - weight: 20
+          action:
+            proxy:
+              upstream: airport-service
+              rewritePath: /airports_v2
+    - path: /
+      action:
+        proxy:
+          upstream: airport-service
